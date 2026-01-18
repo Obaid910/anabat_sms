@@ -55,6 +55,14 @@ services:
         value: https://anabat-sms-backend.onrender.com
       - key: FRONTEND_URL
         value: https://anabat-sms-frontend.onrender.com
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: BROADCAST_DRIVER
+        value: log
 
   # React Frontend
   - type: web
