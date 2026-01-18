@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Laravel Backend
+  backend:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: anabat-sms-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    networks:
+      - anabat-network
+    depends_on:
+      - database
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=pgsql
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_DATABASE=anabat_sms
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=secret
+
+  # Nginx Service
+  webserver:
+    image: nginx:alpine
+    container_name: anabat-sms-webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - anabat-network
+    depends_on:
+      - backend
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    container_name: anabat-sms-frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    command: npm run dev
+    networks:
+      - anabat-network
+
+  # PostgreSQL Service
+  database:
+    image: postgres:14-alpine
+    container_name: anabat-sms-database
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=anabat_sms
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - anabat-network
+
+  # Redis Service
+  cache:
+    image: redis:alpine
+    container_name: anabat-sms-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - anabat-network
+
+networks:
+  anabat-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

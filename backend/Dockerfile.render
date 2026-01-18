@@ -1,0 +1,68 @@
+# Render.com optimized Dockerfile for Laravel
+FROM php:8.1-apache
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application files
+COPY . .
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
+
+# Configure Apache to listen on port 10000 (Render default)
+RUN sed -i 's/Listen 80/Listen 10000/' /etc/apache2/ports.conf
+
+# Configure Apache DocumentRoot
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Update VirtualHost to use port 10000
+RUN sed -i 's/<VirtualHost \*:80>/<VirtualHost *:10000>/' /etc/apache2/sites-available/000-default.conf
+
+# Create .env file from example if it doesn't exist
+RUN if [ ! -f .env ]; then cp .env.example.configured .env; fi
+
+# Generate application key if not set
+RUN php artisan key:generate --force
+
+# Optimize for production
+RUN composer dump-autoload --optimize
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+php artisan migrate --force\n\
+php artisan db:seed --force\n\
+php artisan config:cache\n\
+php artisan route:cache\n\
+php artisan view:cache\n\
+apache2-foreground' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
+
+# Expose port 10000 (Render default)
+EXPOSE 10000
+
+# Start Apache with migrations
+CMD ["/usr/local/bin/start.sh"]

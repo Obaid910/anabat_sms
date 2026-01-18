@@ -1,0 +1,68 @@
+# Render.com optimized Dockerfile for React
+# Build stage
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build argument for API URL
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built assets from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Create nginx configuration for Render (port 10000)
+RUN echo 'server {\n\
+    listen 10000;\n\
+    server_name _;\n\
+    root /usr/share/nginx/html;\n\
+    index index.html;\n\
+\n\
+    gzip on;\n\
+    gzip_vary on;\n\
+    gzip_min_length 1024;\n\
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;\n\
+\n\
+    add_header X-Frame-Options "SAMEORIGIN" always;\n\
+    add_header X-Content-Type-Options "nosniff" always;\n\
+    add_header X-XSS-Protection "1; mode=block" always;\n\
+\n\
+    location / {\n\
+        try_files $uri $uri/ /index.html;\n\
+    }\n\
+\n\
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {\n\
+        expires 1y;\n\
+        add_header Cache-Control "public, immutable";\n\
+    }\n\
+\n\
+    location /health {\n\
+        access_log off;\n\
+        return 200 "healthy\n";\n\
+        add_header Content-Type text/plain;\n\
+    }\n\
+}' > /etc/nginx/conf.d/default.conf
+
+# Remove default nginx config
+RUN rm -f /etc/nginx/conf.d/default.conf.default
+
+# Expose port 10000 (Render default)
+EXPOSE 10000
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
