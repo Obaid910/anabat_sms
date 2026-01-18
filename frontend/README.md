@@ -88,10 +88,10 @@ src/
 
 ### Authentication
 - Login with email and password
-- User registration
 - Token-based authentication
 - Auto-redirect for authenticated users
 - Protected routes
+- User registration is admin-only (no public signup)
 
 ### UI Components
 - Responsive layout with sidebar navigation

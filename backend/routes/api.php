@@ -21,7 +21,8 @@ Route::get('/health', function () {
 });
 
 // Public routes
-Route::post('/register', [AuthController::class, 'register']);
+// Registration is disabled - users should be created by administrators only
+// Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // Protected routes

@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import MainLayout from './components/layout/MainLayout';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 
 function App() {
@@ -16,10 +15,6 @@ function App() {
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />}
-      />
-      <Route
-        path="/register"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />}
       />
 
       {/* Protected routes */}

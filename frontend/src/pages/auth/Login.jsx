@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
   Container,
   Box,
   Typography,
-  Link,
   Alert,
   Paper,
 } from '@mui/material';
@@ -130,12 +129,6 @@ const Login = () => {
             >
               Sign In
             </Button>
-
-            <Box sx={{ textAlign: 'center' }}>
-              <Link component={RouterLink} to="/register" variant="body2">
-                Don't have an account? Sign Up
-              </Link>
-            </Box>
           </Box>
         </Paper>
 

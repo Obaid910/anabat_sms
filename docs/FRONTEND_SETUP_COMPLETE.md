@@ -92,13 +92,7 @@ frontend/
   - Form validation with React Hook Form
   - Error display
   - Loading states
-  - Link to registration
-
-- **Register Page**
-  - Full name, email, phone, password fields
-  - Password confirmation
-  - Comprehensive validation
-  - Error handling
+  - No public registration (admin-only user creation)
 
 ### 10. Dashboard Page ✅
 - Welcome message
@@ -185,10 +179,11 @@ frontend/
 ## API Endpoints Used
 
 - `POST /api/login` - User login
-- `POST /api/register` - User registration
 - `GET /api/me` - Get current user
 - `POST /api/logout` - User logout
 - `POST /api/refresh` - Refresh token
+
+**Note:** Public registration endpoint is disabled. Users must be created by administrators through the User Management interface.
 
 ## Environment Configuration
 
@@ -241,10 +236,7 @@ Output in `dist/` directory
    - Use credentials: `admin@anabatsms.com` / `password`
    - Should redirect to dashboard after login
 
-4. **Test Registration**:
-   - Click "Sign Up" link
-   - Fill in registration form
-   - Should create account and redirect to dashboard
+**Note:** There is no public registration. New users must be created by administrators.
 
 ## Next Development Steps
 

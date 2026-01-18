@@ -64,6 +64,8 @@ npm run dev
 2. Login with: `admin@anabatsms.com` / `password`
 3. You should see the dashboard after successful login
 
+**Note:** Public registration is disabled. New users must be created by administrators through the User Management interface.
+
 ## Default Test Users
 
 | Role | Email | Password |
@@ -74,7 +76,6 @@ npm run dev
 
 ## Available API Endpoints
 
-- `POST /api/register` - Register user
 - `POST /api/login` - Login
 - `GET /api/me` - Get user profile (auth required)
 - `POST /api/logout` - Logout (auth required)
