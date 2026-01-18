@@ -16,6 +16,7 @@ services:
     name: anabat-sms-backend
     env: docker
     dockerfilePath: ./backend/Dockerfile.render
+    dockerContext: ./backend
     region: oregon
     plan: free
     healthCheckPath: /api/health
@@ -60,6 +61,7 @@ services:
     name: anabat-sms-frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile.render
+    dockerContext: ./frontend
     region: oregon
     plan: free
     healthCheckPath: /health
