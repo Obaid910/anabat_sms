@@ -1,16 +1,15 @@
 # Render.com Blueprint Configuration
 # This file defines all services for the Anabat SMS project
 
-services:
+databases:
   # PostgreSQL Database
-  - type: pserv
-    name: anabat-sms-db
-    env: docker
+  - name: anabat-sms-db
+    databaseName: anabat_sms
+    user: anabat_user
     plan: free
     region: oregon
-    databases:
-      - name: anabat_sms
-        user: anabat_user
+
+services:
 
   # Laravel Backend API
   - type: web
