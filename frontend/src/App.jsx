@@ -4,7 +4,16 @@ import { useSelector } from 'react-redux';
 import MainLayout from './components/layout/MainLayout';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './pages/auth/Login';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import Dashboard from './pages/dashboard/Dashboard';
+import BranchManagement from './pages/admin/BranchManagement';
+import UserManagement from './pages/admin/UserManagement';
+import UserProfile from './pages/profile/UserProfile';
+import LeadList from './pages/leads/LeadList';
+import LeadForm from './pages/leads/LeadForm';
+import LeadDetails from './pages/leads/LeadDetails';
+import LeadAnalytics from './pages/leads/LeadAnalytics';
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -16,6 +25,8 @@ function App() {
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />}
       />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Protected routes */}
       <Route
@@ -45,7 +56,51 @@ function App() {
         element={
           <PrivateRoute>
             <MainLayout>
-              <div>Leads Page - Coming Soon</div>
+              <LeadList />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/leads/new"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <LeadForm />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/leads/analytics"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <LeadAnalytics />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/leads/:id"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <LeadDetails />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/leads/:id/edit"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <LeadForm />
             </MainLayout>
           </PrivateRoute>
         }
@@ -100,7 +155,40 @@ function App() {
         element={
           <PrivateRoute>
             <MainLayout>
-              <div>Branches Page - Coming Soon</div>
+              <BranchManagement />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/admin/branches"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <BranchManagement />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <UserManagement />
+            </MainLayout>
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <MainLayout>
+              <UserProfile />
             </MainLayout>
           </PrivateRoute>
         }

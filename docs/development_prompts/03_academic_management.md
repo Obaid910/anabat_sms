@@ -34,21 +34,21 @@ I need to implement the Attendance Module for the Anabat School Management Syste
 10. Create mobile-friendly attendance marking interface
 ```
 
-## Communication Module with SMS Integration
+## Communication Module with Whatsapp Integration
 
 ```
-I need to implement the Communication Module with SMS integration for the Anabat School Management System. Please:
+I need to implement the Communication Module with Whatsapp integration for the Anabat School Management System. Please:
 
 1. Create database migrations for sms_templates, sms_logs, and sms_events tables
 2. Implement models with proper relationships
 3. Develop SMS template management with variable support
-4. Create SMS sending service with queue support
-5. Implement event-based SMS triggers
-6. Develop SMS history and tracking
-7. Create bulk SMS sending functionality
-8. Implement SMS gateway provider integration
-9. Develop SMS analytics and reporting
-10. Create SMS scheduling functionality
+4. Create Whatsapp sending service with queue support
+5. Implement event-based Whatsapp triggers
+6. Develop Whatsapp history and tracking
+7. Create bulk Whatsapp sending functionality
+8. Implement Whatsapp gateway provider integration
+9. Develop Whatsapp analytics and reporting
+10. Create Whatsapp scheduling functionality
 ```
 
 ## Exams Module with Grading

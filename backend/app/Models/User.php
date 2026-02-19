@@ -57,10 +57,41 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the activities for the user.
+     */
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
+
+    /**
      * Check if user is active.
      */
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    /**
+     * Check if user is suspended.
+     */
+    public function isSuspended(): bool
+    {
+        return $this->status === 'suspended';
+    }
+
+    /**
+     * Log user activity.
+     */
+    public function logActivity(string $type, ?string $description = null, ?array $metadata = null, ?string $ipAddress = null, ?string $userAgent = null): void
+    {
+        $this->activities()->create([
+            'activity_type' => $type,
+            'description' => $description,
+            'metadata' => $metadata,
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent,
+            'created_at' => now(),
+        ]);
     }
 }

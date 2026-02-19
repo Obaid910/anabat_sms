@@ -1,4 +1,5 @@
 import axios from 'axios';
+import branchContext from '../utils/branchContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -9,13 +10,20 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and branch context
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add branch context if available
+    const branchId = branchContext.getBranchId();
+    if (branchId) {
+      config.headers['X-Branch-Id'] = branchId;
+    }
+
     return config;
   },
   (error) => {
@@ -23,9 +31,20 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors
+// Response interceptor to handle errors and clean responses
 api.interceptors.response.use(
   (response) => {
+    // Handle cases where PHP errors/warnings corrupt the JSON response
+    if (typeof response.data === 'string' && response.data.includes('{')) {
+      try {
+        // Extract JSON from corrupted response
+        const jsonStart = response.data.indexOf('{');
+        const jsonString = response.data.substring(jsonStart);
+        response.data = JSON.parse(jsonString);
+      } catch (e) {
+        console.error('Failed to parse response:', e);
+      }
+    }
     return response;
   },
   (error) => {

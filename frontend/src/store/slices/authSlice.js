@@ -16,13 +16,17 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await authService.login(credentials);
-      // authService.login returns {success, message, data: {user, token}}
-      // We need to return {user, token} for the reducer
-      return response.data;
+      // authService.login now returns {user, token, expires_at}
+      const data = await authService.login(credentials);
+      
+      if (!data || !data.user) {
+        return rejectWithValue('Invalid response from server');
+      }
+      
+      return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 'Login failed'
+        error.response?.data?.message || error.message || 'Login failed'
       );
     }
   }
@@ -32,10 +36,9 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await authService.register(userData);
-      // authService.register returns {success, message, data: {user, token}}
-      // We need to return {user, token} for the reducer
-      return response.data;
+      // authService.register now returns {user, token}
+      const data = await authService.register(userData);
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || 'Registration failed'
@@ -80,7 +83,8 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload.user;
+        // action.payload should be {user, token, expires_at}
+        state.user = action.payload?.user || action.payload;
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
@@ -97,7 +101,8 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload.user;
+        // action.payload should be {user, token}
+        state.user = action.payload?.user || action.payload;
         state.error = null;
       })
       .addCase(register.rejected, (state, action) => {

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
   Container,
@@ -8,22 +8,30 @@ import {
   Typography,
   Alert,
   Paper,
+  FormControlLabel,
+  Checkbox,
+  Link as MuiLink,
 } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import { login, clearError } from '../../store/slices/authSlice';
 import TextField from '../../components/common/TextField';
 import Button from '../../components/common/Button';
+import { validateEmail, validateRequired } from '../../utils/validation';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, error } = useSelector((state) => state.auth);
+  const [rememberMe, setRememberMe] = React.useState(false);
   
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    mode: 'onBlur', // Validate on blur
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -38,7 +46,13 @@ const Login = () => {
   }, [dispatch]);
 
   const onSubmit = async (data) => {
-    await dispatch(login(data));
+    try {
+      await dispatch(login({ ...data, remember_me: rememberMe })).unwrap();
+      // Navigation handled by useEffect when isAuthenticated changes
+    } catch (error) {
+      // Error is already set in Redux state, no need to handle here
+      console.error('Login failed:', error);
+    }
   };
 
   return (
@@ -119,6 +133,22 @@ const Login = () => {
                 },
               })}
             />
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="Remember me"
+              />
+              <MuiLink component={Link} to="/forgot-password" variant="body2">
+                Forgot password?
+              </MuiLink>
+            </Box>
 
             <Button
               type="submit"

@@ -4,11 +4,17 @@ const authService = {
   // Login user
   login: async (credentials) => {
     const response = await api.post('/login', credentials);
+    
     if (response.data.success && response.data.data.token) {
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      // Store expires_at if present
+      if (response.data.data.expires_at) {
+        localStorage.setItem('token_expires_at', response.data.data.expires_at);
+      }
     }
-    return response.data;
+    // Return the data object which contains {user, token, expires_at}
+    return response.data.data;
   },
 
   // Register user
@@ -18,7 +24,7 @@ const authService = {
       localStorage.setItem('token', response.data.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.data.user));
     }
-    return response.data;
+    return response.data.data;
   },
 
   // Logout user
@@ -47,8 +53,11 @@ const authService = {
     const response = await api.post('/refresh');
     if (response.data.success && response.data.data.token) {
       localStorage.setItem('token', response.data.data.token);
+      if (response.data.data.expires_at) {
+        localStorage.setItem('token_expires_at', response.data.data.expires_at);
+      }
     }
-    return response.data;
+    return response.data.data;
   },
 
   // Get stored token
@@ -65,6 +74,43 @@ const authService = {
   // Check if user is authenticated
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
+  },
+
+  // Forgot password
+  forgotPassword: async (email) => {
+    const response = await api.post('/forgot-password', { email });
+    return response.data; // Returns {success, message}
+  },
+
+  // Reset password
+  resetPassword: async (data) => {
+    const response = await api.post('/reset-password', data);
+    return response.data; // Returns {success, message}
+  },
+
+  // Change password
+  changePassword: async (currentPassword, newPassword, passwordConfirmation) => {
+    const response = await api.post('/change-password', {
+      current_password: currentPassword,
+      password: newPassword,
+      password_confirmation: passwordConfirmation,
+    });
+    return response.data; // Returns {success, message}
+  },
+
+  // Update profile
+  updateProfile: async (profileData) => {
+    const response = await api.put('/profile', profileData);
+    if (response.data.success) {
+      localStorage.setItem('user', JSON.stringify(response.data.data));
+    }
+    return response.data;
+  },
+
+  // Get activity log
+  getActivityLog: async (perPage = 15) => {
+    const response = await api.get(`/activity-log?per_page=${perPage}`);
+    return response.data; // Returns {success, data: pagination}
   },
 };
 
